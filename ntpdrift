@@ -7,7 +7,7 @@ cleanup(){
 }
 
 ctrl_c(){
-  echo "Cleaning up..."
+  echo -e "\nCleaning up..."
   cleanup
   exit
 }
@@ -19,7 +19,7 @@ do
   clear
   curtime=$(date +%s)
   offset=$(ntpq -c "rv 0 offset" | cut -d "=" -f 2) 
-  echo $curtime $offset >> /tmp/ntpdrift.$pid
+  echo -e "$curtime\t$offset" >> /tmp/ntpdrift.$pid
   gnuplot -e 'set terminal dumb; set ylabel "NTP Drift (ms)"; set xlabel "Time (in seconds since the epoch)"; plot "< tail -20 /tmp/ntpdrift.'"$pid"'" with lines;'
   sleep 60
 done;
