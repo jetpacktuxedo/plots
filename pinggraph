@@ -1,12 +1,12 @@
 #! /usr/bin/env bash
 
+pid=$$
 dest=google.com
 dest=$1
 
-rm pinggraph.data
 while true
 do
-  ping -nc 1 $dest | grep time= | awk -F [=\ ] {'print $(NF-1)'} >> pinggraph.data
-  gnuplot -e 'set terminal dumb; set ylabel "Ping round trip time (ms)"; set xlabel "Number"; plot "< tail -20 pinggraph.data" with lines;'
+  ping -nc 1 $dest | grep time= | awk -F [=\ ] {'print $(NF-1)'} >> /tmp/pinggraph.$pid
+  gnuplot -e 'set terminal dumb; set ylabel "Ping round trip time (ms)"; set xlabel "Number"; plot "< tail -20 /tmp/pinggraph.'"$pid"'" with lines;'
   sleep 0.25
 done;
