@@ -17,7 +17,9 @@ trap ctrl_c SIGINT
 while true
 do 
   clear
-  ntpq -c "rv 0 offset" | cut -d "=" -f 2 >> /tmp/ntpdrift.$pid
-  gnuplot -e 'set terminal dumb; set ylabel "NTP Drift (ms)"; set xlabel "Number"; plot "< tail -20 /tmp/ntpdrift.'"$pid"'" with lines;'
+  curtime=$(date +%s)
+  offset=$(ntpq -c "rv 0 offset" | cut -d "=" -f 2) 
+  echo $curtime $offset >> /tmp/ntpdrift.$pid
+  gnuplot -e 'set terminal dumb; set ylabel "NTP Drift (ms)"; set xlabel "Time (in seconds since the epoch)"; plot "< tail -20 /tmp/ntpdrift.'"$pid"'" with lines;'
   sleep 60
 done;
