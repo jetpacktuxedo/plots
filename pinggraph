@@ -1,6 +1,7 @@
 #! /usr/bin/env bash
 
 dest=google.com
+dest=$1
 
 rm pinggraph.data
 while true
