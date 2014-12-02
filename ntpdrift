@@ -1,10 +1,23 @@
 #! /bin/bash
 
-rm ntpdrift.data
+pid=$$
+
+cleanup(){
+  rm -rf /tmp/ntpdrift.$pid
+}
+
+ctrl_c(){
+  echo "Cleaning up..."
+  cleanup
+  exit
+}
+
+trap ctrl_c SIGINT
+
 while true
 do 
   clear
-  ntpq -c "rv 0 offset" | cut -d "=" -f 2 >> ntpdrift.data
-  gnuplot -e 'set terminal dumb; set ylabel "NTP Drift (ms)"; set xlabel "Number"; plot "< tail -20 ntpdrift.data" with lines;'
+  ntpq -c "rv 0 offset" | cut -d "=" -f 2 >> /tmp/ntpdrift.$pid
+  gnuplot -e 'set terminal dumb; set ylabel "NTP Drift (ms)"; set xlabel "Number"; plot "< tail -20 /tmp/ntpdrift.'"$pid"'" with lines;'
   sleep 60
 done;
