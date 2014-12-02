@@ -2,10 +2,10 @@
 
 pid=$$
 dest=google.com
-dest=$1
+if [ $# -gt 0 ]; then dest=$1; fi
 
 cleanup(){
-  rm -rf /tmp/ntpdrift.$pid
+  rm -rf /tmp/pinggraph.$pid
 }
 
 ctrl_c(){
@@ -18,7 +18,9 @@ trap ctrl_c SIGINT
 
 while true
 do
-  ping -nc 1 $dest | grep time= | awk -F [=\ ] {'print $(NF-1)'} >> /tmp/pinggraph.$pid
+  curtime=$(date +%s.%N)
+  pingtime=$(ping -nc 1 $dest | grep time= | awk -F [=\ ] {'print $(NF-1)'}) 
+  echo -e "$curtime\t$pingtime" >> /tmp/pinggraph.$pid
   gnuplot -e 'set terminal dumb; set ylabel "Ping round trip time (ms)"; set xlabel "Number"; plot "< tail -20 /tmp/pinggraph.'"$pid"'" with lines;'
-  sleep 0.25
+  sleep 0.5
 done;
