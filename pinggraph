@@ -4,6 +4,16 @@ pid=$$
 dest=google.com
 dest=$1
 
+cleanup(){
+  rm -rf /tmp/ntpdrift.$pid
+}
+
+ctrl_c(){
+  echo -e "\nCleaning up..."
+  cleanup
+  exit
+}
+
 while true
 do
   ping -nc 1 $dest | grep time= | awk -F [=\ ] {'print $(NF-1)'} >> /tmp/pinggraph.$pid
