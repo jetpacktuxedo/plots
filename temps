@@ -1,0 +1,25 @@
+#! /usr/bin/env bash
+
+pid=$$
+if [ $# -gt 0 ]; then dest=$1; fi
+
+cleanup(){
+  rm -rf /tmp/tempgraph.$pid
+}
+
+ctrl_c(){
+  echo -e "\nCleaning up..."
+  cleanup
+  exit
+}
+
+trap ctrl_c SIGINT
+
+while true
+do
+  curtime=$(date +%s.%N)
+  temp=$(sensors | grep temp1 | awk -F " " {'print $(2)'} | sed -E "s/[+Â°C]//g") 
+  echo -e "$curtime\t$temp" >> /tmp/tempgraph.$pid
+  gnuplot -e 'set terminal dumb; set ylabel "Temp in C"; set xlabel "Number"; plot "< tail -20 /tmp/tempgraph.'"$pid"'" with lines;'
+  sleep 0.5
+done;
